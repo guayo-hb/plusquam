@@ -2,14 +2,110 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Test Seite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pronomen Übung</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Verhindert das "Verschwinden" auf mobilen Browsern */
+        html, body { 
+            height: auto !important; 
+            min-height: 100%; 
+            overflow-y: auto !important; 
+            background: #f8fafc;
+        }
+        .exercise-input { 
+            border: 2px solid #e2e8f0; 
+            border-radius: 8px; 
+            padding: 4px 8px; 
+            width: 100px; 
+            margin: 2px;
+        }
+        .correct { border-color: #10b981 !important; background-color: #ecfdf5; }
+        .incorrect { border-color: #ef4444 !important; background-color: #fef2f2; }
+        .solution-hint { 
+            color: white; 
+            background: #6366f1; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-size: 0.8rem; 
+            margin-left: 4px;
+        }
+    </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-xl shadow-lg text-center">
-        <h1 class="text-2xl font-bold text-green-600">Die Seite lädt!</h1>
-        <p class="mt-4 text-gray-600">Wenn du das siehst, funktioniert GitHub Pages.</p>
-        <button onclick="alert('JavaScript geht auch!')" class="mt-6 bg-blue-500 text-white px-4 py-2 rounded">Klick Test</button>
+<body class="p-4">
+    <div id="app" class="max-w-md mx-auto bg-white shadow-lg rounded-xl p-6">
+        <h1 id="title" class="text-xl font-bold mb-4 text-slate-800">Lade Übung...</h1>
+        
+        <div id="content" class="space-y-4">
+            </div>
+
+        <div id="feedback" class="mt-4 p-3 hidden rounded-lg text-center font-bold"></div>
+
+        <div class="mt-8 flex gap-2">
+            <button id="checkBtn" class="bg-slate-800 text-white px-4 py-3 rounded-lg flex-1 font-bold uppercase">Prüfen</button>
+            <button id="nextBtn" class="bg-indigo-600 text-white px-4 py-3 rounded-lg flex-1 font-bold uppercase hidden">Weiter</button>
+        </div>
     </div>
+
+    <script>
+        const tasks = [
+            {
+                title: "Übung 8: der/die/das",
+                text: "Ob <input type='text' class='exercise-input' data-sol='der'> das Mofa gehört? Mit <input type='text' class='exercise-input' data-sol='der'> würde ich gern Kaffee trinken."
+            },
+            {
+                title: "Übung 10: Indefinitpronomen",
+                text: "Ich suche Blattsalat. – Tut mir leid, wir haben <input type='text' class='exercise-input' data-sol='keinen'> mehr."
+            }
+        ];
+
+        let currentTask = 0;
+
+        function render() {
+            const task = tasks[currentTask];
+            document.getElementById('title').innerText = task.title;
+            document.getElementById('content').innerHTML = task.text;
+            document.getElementById('feedback').classList.add('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            document.getElementById('checkBtn').classList.remove('hidden');
+        }
+
+        document.getElementById('checkBtn').onclick = () => {
+            let points = 0;
+            let total = 0;
+            const inputs = document.querySelectorAll('.exercise-input');
+            
+            inputs.forEach(input => {
+                total++;
+                if (input.value.trim().toLowerCase() === input.dataset.sol.toLowerCase()) {
+                    input.classList.add('correct');
+                    points++;
+                } else {
+                    input.classList.add('incorrect');
+                    const span = document.createElement('span');
+                    span.className = 'solution-hint';
+                    span.innerText = input.dataset.sol;
+                    input.after(span);
+                }
+            });
+
+            const fb = document.getElementById('feedback');
+            fb.innerText = `${points} von ${total} richtig!`;
+            fb.className = "mt-4 p-3 rounded-lg text-center font-bold " + (points === total ? "bg-green-100 text-green-700" : "bg-blue-100 text-blue-700");
+            fb.classList.remove('hidden');
+            
+            if (currentTask < tasks.length - 1) {
+                document.getElementById('nextBtn').classList.remove('hidden');
+            }
+        };
+
+        document.getElementById('nextBtn').onclick = () => {
+            currentTask++;
+            render();
+        };
+
+        // Start
+        render();
+    </script>
 </body>
 </html>
